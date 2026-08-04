@@ -1,5 +1,5 @@
-import { handleHappySeedsLogout } from "../../../../lib/happyseeds-platform-auth";
+import { handleLogout } from "@/lib/google-auth";
 
 export const dynamic = "force-dynamic";
 
-export const POST = handleHappySeedsLogout;
+export const POST = handleLogout;

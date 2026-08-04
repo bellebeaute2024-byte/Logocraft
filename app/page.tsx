@@ -69,7 +69,7 @@ export default function Home() {
 
     // Listen for auth completion from popup
     const handler = (e: MessageEvent) => {
-      if (e.data?.type === "happyseeds:auth-complete") {
+      if (e.data?.type === "lc:auth-complete") {
         fetchMe();
       }
     };

@@ -1,23 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { handleHappySeedsMe } from "@/lib/happyseeds-platform-auth";
+import { getSession } from "@/lib/google-auth";
 import { getOrCreateUser, hasUnlimitedPlan } from "@/lib/user-service";
 
 export const runtime = "nodejs";
 
 export async function GET(req: NextRequest) {
   try {
-    const meResponse = await handleHappySeedsMe(req);
-    if (meResponse.status !== 200) {
+    const sessionUser = await getSession(req);
+    if (!sessionUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const meData = await meResponse.json();
-    const hsUser = meData.user;
 
     const user = await getOrCreateUser({
-      id: hsUser.openid,
-      email: hsUser.email ?? `${hsUser.openid}@noemail.local`,
-      name: hsUser.display_name ?? undefined,
-      avatar_url: hsUser.avatar_url ?? undefined,
+      id: sessionUser.id,
+      email: sessionUser.email,
+      name: sessionUser.name ?? undefined,
+      avatar_url: sessionUser.avatar_url ?? undefined,
     });
 
     const unlimited = await hasUnlimitedPlan(user.id);

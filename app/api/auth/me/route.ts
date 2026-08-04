@@ -1,5 +1,5 @@
-import { handleHappySeedsMe } from "../../../../lib/happyseeds-platform-auth";
+import { handleMe } from "@/lib/google-auth";
 
 export const dynamic = "force-dynamic";
 
-export const GET = handleHappySeedsMe;
+export const GET = handleMe;
