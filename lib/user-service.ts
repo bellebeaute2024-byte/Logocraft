@@ -27,7 +27,6 @@ export async function getOrCreateUser(authUser: {
       email: authUser.email,
       name: authUser.name ?? null,
       avatarUrl: authUser.avatar_url ?? null,
-      updatedAt: new Date(),
     },
   })
   .returning()
@@ -49,7 +48,7 @@ export async function deductCredit(userId: string): Promise<boolean> {
   if (!user || user.credits < 1) return false
 
   await db.update(users)
-    .set({ credits: user.credits - 1, updatedAt: new Date() })
+    .set({ credits: user.credits - 1 })
     .where(eq(users.id, userId))
   return true
 }
@@ -58,7 +57,7 @@ export async function addCredits(userId: string, amount: number): Promise<void> 
   const user = await getUserById(userId)
   if (!user) return
   await db.update(users)
-    .set({ credits: user.credits + amount, updatedAt: new Date() })
+    .set({ credits: user.credits + amount })
     .where(eq(users.id, userId))
 }
 
