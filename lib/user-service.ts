@@ -20,7 +20,17 @@ export async function getOrCreateUser(authUser: {
     avatarUrl: authUser.avatar_url ?? null,
     credits: 2,
     freeCreditsUsed: false,
-  }).returning()
+  })
+  .onConflictDoUpdate({
+    target: users.id,
+    set: {
+      email: authUser.email,
+      name: authUser.name ?? null,
+      avatarUrl: authUser.avatar_url ?? null,
+      updatedAt: new Date(),
+    },
+  })
+  .returning()
   return created
 }
 
