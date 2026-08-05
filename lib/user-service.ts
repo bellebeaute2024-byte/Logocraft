@@ -10,9 +10,21 @@ export async function getOrCreateUser(authUser: {
   name?: string
   avatar_url?: string
 }): Promise<User> {
+  // Try to find existing user first
   const existing = await db.select().from(users).where(eq(users.id, authUser.id)).limit(1)
-  if (existing.length > 0) return existing[0]
+  if (existing.length > 0) {
+    // Update name/avatar in case they changed
+    await db.update(users)
+      .set({ name: authUser.name ?? null, avatarUrl: authUser.avatar_url ?? null })
+      .where(eq(users.id, authUser.id))
+    return existing[0]
+  }
 
+  // Also check by email to avoid unique constraint on email
+  const byEmail = await db.select().from(users).where(eq(users.email, authUser.email)).limit(1)
+  if (byEmail.length > 0) return byEmail[0]
+
+  // Create new user
   const [created] = await db.insert(users).values({
     id: authUser.id,
     email: authUser.email,
@@ -20,16 +32,7 @@ export async function getOrCreateUser(authUser: {
     avatarUrl: authUser.avatar_url ?? null,
     credits: 2,
     freeCreditsUsed: false,
-  })
-  .onConflictDoUpdate({
-    target: users.id,
-    set: {
-      email: authUser.email,
-      name: authUser.name ?? null,
-      avatarUrl: authUser.avatar_url ?? null,
-    },
-  })
-  .returning()
+  }).returning()
   return created
 }
 

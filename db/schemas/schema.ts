@@ -9,6 +9,7 @@ export const users = pgTable('users', {
   credits: integer('credits').notNull().default(2), // 2 free credits on signup
   freeCreditsUsed: boolean('free_credits_used').notNull().default(false),
   createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })
 
 // Subscriptions table - tracks active Paddle subscriptions
