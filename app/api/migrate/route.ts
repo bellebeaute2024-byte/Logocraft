@@ -14,20 +14,14 @@ export async function GET(req: NextRequest) {
 
   const results: string[] = [];
 
+  // First: show actual columns in users table
   try {
-    // Add free_credits_used column if missing
-    await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS free_credits_used boolean NOT NULL DEFAULT false`);
-    results.push("✅ free_credits_used column OK");
-  } catch (e) { results.push("free_credits_used: " + String(e)); }
+    const cols = await db.execute(sql`SELECT column_name FROM information_schema.columns WHERE table_name = 'users' ORDER BY ordinal_position`);
+    results.push("CURRENT COLUMNS: " + (cols as {column_name:string}[]).map((r: {column_name:string}) => r.column_name).join(", "));
+  } catch (e) { results.push("cols check: " + String(e)); }
 
   try {
-    // Add credits column if missing
-    await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS credits integer NOT NULL DEFAULT 2`);
-    results.push("✅ credits column OK");
-  } catch (e) { results.push("credits: " + String(e)); }
-
-  try {
-    // Create users table if it doesn't exist
+    // Create users table with all required columns
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS users (
         id text PRIMARY KEY,
@@ -36,12 +30,26 @@ export async function GET(req: NextRequest) {
         avatar_url text,
         credits integer NOT NULL DEFAULT 2,
         free_credits_used boolean NOT NULL DEFAULT false,
-        created_at timestamp NOT NULL DEFAULT now(),
-        updated_at timestamp NOT NULL DEFAULT now()
+        created_at timestamp NOT NULL DEFAULT now()
       )
     `);
-    results.push("✅ users table OK");
+    results.push("✅ users table created/exists");
   } catch (e) { results.push("users table: " + String(e)); }
+
+  try {
+    await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS credits integer NOT NULL DEFAULT 2`);
+    results.push("✅ credits column OK");
+  } catch (e) { results.push("credits col: " + String(e)); }
+
+  try {
+    await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS free_credits_used boolean NOT NULL DEFAULT false`);
+    results.push("✅ free_credits_used column OK");
+  } catch (e) { results.push("free_credits_used col: " + String(e)); }
+
+  try {
+    await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS created_at timestamp NOT NULL DEFAULT now()`);
+    results.push("✅ created_at column OK");
+  } catch (e) { results.push("created_at col: " + String(e)); }
 
   try {
     await db.execute(sql`
