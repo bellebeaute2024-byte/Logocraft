@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { Sparkles, ChevronDown } from "lucide-react";
 import type { LogoConfig } from "@/app/page";
+import { translations, type Lang } from "@/lib/i18n";
 
 interface Props {
   onGenerate: (config: LogoConfig) => void;
   isGenerating: boolean;
   isLoggedIn: boolean;
   onLoginClick: () => void;
+  lang: Lang;
 }
 
 const INDUSTRIES = [
@@ -18,14 +20,16 @@ const INDUSTRIES = [
 ];
 
 const STYLES = [
-  { id: "minimalist", label: "Minimalist", desc: "Clean, simple, timeless" },
-  { id: "modern", label: "Modern", desc: "Sleek, professional, bold" },
-  { id: "vintage", label: "Vintage", desc: "Classic, retro, nostalgic" },
-  { id: "playful", label: "Playful", desc: "Fun, colorful, friendly" },
-  { id: "luxury", label: "Luxury", desc: "Elegant, premium, refined" },
-  { id: "tech", label: "Tech", desc: "Futuristic, digital, sharp" },
-  { id: "organic", label: "Organic", desc: "Natural, earthy, flowing" },
-  { id: "geometric", label: "Geometric", desc: "Abstract, structured, bold" },
+  { id: "minimalist", label: "Minimalist", labelAr: "بسيط", desc: "Clean, simple, timeless", descAr: "نظيف وبسيط وخالد" },
+  { id: "modern", label: "Modern", labelAr: "عصري", desc: "Sleek, professional, bold", descAr: "أنيق ومهني وجريء" },
+  { id: "vintage", label: "Vintage", labelAr: "كلاسيكي", desc: "Classic, retro, nostalgic", descAr: "كلاسيكي وعتيق ونوستالجي" },
+  { id: "playful", label: "Playful", labelAr: "مرح", desc: "Fun, colorful, friendly", descAr: "ممتع وملوّن وودود" },
+  { id: "luxury", label: "Luxury", labelAr: "فاخر", desc: "Elegant, premium, refined", descAr: "أنيق وراقٍ ومتطور" },
+  { id: "tech", label: "Tech", labelAr: "تقني", desc: "Futuristic, digital, sharp", descAr: "مستقبلي ورقمي وحاد" },
+  { id: "organic", label: "Organic", labelAr: "طبيعي", desc: "Natural, earthy, flowing", descAr: "طبيعي وترابي وسلس" },
+  { id: "geometric", label: "Geometric", labelAr: "هندسي", desc: "Abstract, structured, bold", descAr: "مجرد ومنظم وجريء" },
+  { id: "arabic_calligraphy", label: "Arabic", labelAr: "خط عربي", desc: "Calligraphic, cultural", descAr: "خط عربي وثقافي" },
+  { id: "3d", label: "3D", labelAr: "ثلاثي الأبعاد", desc: "Dimensional, bold, modern", descAr: "بعدي وجريء وعصري" },
 ];
 
 const COLOR_PRESETS = [
@@ -39,7 +43,9 @@ const COLOR_PRESETS = [
   { label: "Custom", primary: "", secondary: "" },
 ];
 
-export default function LogoForm({ onGenerate, isGenerating, isLoggedIn, onLoginClick }: Props) {
+export default function LogoForm({ onGenerate, isGenerating, isLoggedIn, onLoginClick, lang }: Props) {
+  const t = translations[lang];
+  const isRtl = lang === "ar";
   const [brandName, setBrandName] = useState("");
   const [tagline, setTagline] = useState("");
   const [industry, setIndustry] = useState("Technology");
@@ -60,285 +66,123 @@ export default function LogoForm({ onGenerate, isGenerating, isLoggedIn, onLogin
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!brandName.trim()) return;
-    onGenerate({
-      brandName: brandName.trim(),
-      tagline: tagline.trim(),
-      industry,
-      style,
-      primaryColor,
-      secondaryColor,
-      description: description.trim(),
-    });
+    onGenerate({ brandName: brandName.trim(), tagline: tagline.trim(), industry, style, primaryColor, secondaryColor, description: description.trim() });
   };
 
   const inputStyle: React.CSSProperties = {
-    background: "#0a0a0a",
-    border: "1px solid rgba(255,255,255,0.1)",
-    borderRadius: "12px",
-    color: "#fff",
-    padding: "10px 14px",
-    fontSize: "14px",
-    width: "100%",
-    transition: "border-color 200ms ease, box-shadow 200ms ease",
-    outline: "none",
+    background: "#0a0a0a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px",
+    color: "#fff", padding: "10px 14px", fontSize: "14px", width: "100%",
+    transition: "border-color 200ms ease", outline: "none",
   };
-
   const labelStyle: React.CSSProperties = {
-    color: "#A0A0A0",
-    fontSize: "12px",
-    fontFamily: "Geist Mono, monospace",
-    textTransform: "uppercase",
-    letterSpacing: "1px",
-    marginBottom: "8px",
-    display: "block",
+    color: "#A0A0A0", fontSize: "12px",
+    fontFamily: isRtl ? "inherit" : "Geist Mono, monospace",
+    textTransform: isRtl ? "none" : "uppercase",
+    letterSpacing: isRtl ? "0" : "1px",
+    marginBottom: "8px", display: "block",
   };
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-      <div
-        className="glow-card p-5 flex flex-col gap-5"
-        style={{ position: "sticky", top: "72px" }}
-      >
+      <div className="glow-card p-5 flex flex-col gap-5" style={{ position: "sticky", top: "72px" }}>
+
         <div>
-          <span style={labelStyle}>Brand Name *</span>
-          <input
-            style={inputStyle}
-            placeholder="e.g. NovaSpark"
-            value={brandName}
-            onChange={(e) => setBrandName(e.target.value)}
-            required
-            maxLength={60}
-          />
+          <span style={labelStyle}>{t.brandName}</span>
+          <input style={inputStyle} placeholder={t.brandNamePlaceholder} value={brandName} onChange={(e) => setBrandName(e.target.value)} required maxLength={60} />
         </div>
 
         <div>
-          <span style={labelStyle}>Tagline (optional)</span>
-          <input
-            style={inputStyle}
-            placeholder="e.g. Ignite your potential"
-            value={tagline}
-            onChange={(e) => setTagline(e.target.value)}
-            maxLength={80}
-          />
+          <span style={labelStyle}>{t.tagline}</span>
+          <input style={inputStyle} placeholder={t.taglinePlaceholder} value={tagline} onChange={(e) => setTagline(e.target.value)} maxLength={80} />
         </div>
 
         <div>
-          <span style={labelStyle}>Industry</span>
+          <span style={labelStyle}>{t.industry}</span>
           <div className="relative">
-            <select
-              style={{ ...inputStyle, appearance: "none", paddingRight: "36px", cursor: "pointer" }}
-              value={industry}
-              onChange={(e) => setIndustry(e.target.value)}
-            >
-              {INDUSTRIES.map((ind) => (
-                <option key={ind} value={ind} style={{ background: "#111" }}>
-                  {ind}
-                </option>
-              ))}
+            <select style={{ ...inputStyle, appearance: "none", paddingRight: isRtl ? "14px" : "36px", cursor: "pointer" }} value={industry} onChange={(e) => setIndustry(e.target.value)}>
+              {INDUSTRIES.map((ind) => <option key={ind} value={ind} style={{ background: "#111" }}>{ind}</option>)}
             </select>
-            <ChevronDown
-              className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4"
-              style={{ color: "#666" }}
-            />
+            <ChevronDown className={`absolute ${isRtl ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4`} style={{ color: "#666" }} />
           </div>
         </div>
 
         <div>
-          <span style={labelStyle}>Logo Style</span>
+          <span style={labelStyle}>{t.logoStyle}</span>
           <div className="grid grid-cols-2 gap-2">
             {STYLES.map((s) => (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => setStyle(s.id)}
-                style={{
-                  background: style === s.id ? "rgba(0,212,255,0.1)" : "#0a0a0a",
-                  border: style === s.id
-                    ? "1px solid rgba(0,212,255,0.5)"
-                    : "1px solid rgba(255,255,255,0.08)",
-                  borderRadius: "10px",
-                  padding: "8px 10px",
-                  cursor: "pointer",
-                  textAlign: "left",
-                  transition: "all 200ms ease",
-                }}
-              >
+              <button key={s.id} type="button" onClick={() => setStyle(s.id)} style={{
+                background: style === s.id ? "rgba(0,212,255,0.1)" : "#0a0a0a",
+                border: style === s.id ? "1px solid rgba(0,212,255,0.5)" : "1px solid rgba(255,255,255,0.08)",
+                borderRadius: "10px", padding: "8px 10px", cursor: "pointer",
+                textAlign: isRtl ? "right" : "left", transition: "all 200ms ease",
+              }}>
                 <div style={{ color: style === s.id ? "#00D4FF" : "#fff", fontSize: "13px", fontWeight: 600 }}>
-                  {s.label}
+                  {isRtl ? s.labelAr : s.label}
                 </div>
-                <div style={{ color: "#666", fontSize: "11px", marginTop: "2px" }}>{s.desc}</div>
+                <div style={{ color: "#666", fontSize: "11px", marginTop: "2px" }}>
+                  {isRtl ? s.descAr : s.desc}
+                </div>
               </button>
             ))}
           </div>
         </div>
 
         <div>
-          <span style={labelStyle}>Color Palette</span>
+          <span style={labelStyle}>{t.colorPalette}</span>
           <div className="grid grid-cols-4 gap-2 mb-3">
             {COLOR_PRESETS.map((preset, idx) => (
-              <button
-                key={idx}
-                type="button"
-                title={preset.label}
-                onClick={() => handleColorPreset(idx)}
-                style={{
-                  borderRadius: "8px",
-                  padding: "4px",
-                  border: colorPreset === idx
-                    ? "2px solid rgba(0,212,255,0.6)"
-                    : "2px solid transparent",
-                  background: "transparent",
-                  cursor: "pointer",
-                  transition: "border 200ms ease",
-                }}
-              >
+              <button key={idx} type="button" title={preset.label} onClick={() => handleColorPreset(idx)} style={{
+                borderRadius: "8px", padding: "4px",
+                border: colorPreset === idx ? "2px solid rgba(0,212,255,0.6)" : "2px solid transparent",
+                background: "transparent", cursor: "pointer", transition: "border 200ms ease",
+              }}>
                 {preset.primary ? (
-                  <div
-                    style={{
-                      height: "28px",
-                      borderRadius: "6px",
-                      background: `linear-gradient(135deg, ${preset.primary} 0%, ${preset.secondary} 100%)`,
-                    }}
-                  />
+                  <div style={{ height: "28px", borderRadius: "6px", background: `linear-gradient(135deg, ${preset.primary} 0%, ${preset.secondary} 100%)` }} />
                 ) : (
-                  <div
-                    style={{
-                      height: "28px",
-                      borderRadius: "6px",
-                      background: "rgba(255,255,255,0.05)",
-                      border: "1px dashed rgba(255,255,255,0.2)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "#666",
-                      fontSize: "10px",
-                    }}
-                  >
-                    Custom
+                  <div style={{ height: "28px", borderRadius: "6px", background: "rgba(255,255,255,0.05)", border: "1px dashed rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#666", fontSize: "10px" }}>
+                    {t.custom}
                   </div>
                 )}
               </button>
             ))}
           </div>
-
           <div className="flex gap-3">
-            <div className="flex-1">
-              <div style={{ color: "#666", fontSize: "11px", marginBottom: "4px", fontFamily: "monospace" }}>
-                Primary
+            {[
+              { label: t.primary, val: primaryColor, set: (v: string) => { setPrimaryColor(v); setColorPreset(7); } },
+              { label: t.secondary, val: secondaryColor, set: (v: string) => { setSecondaryColor(v); setColorPreset(7); } },
+            ].map(({ label, val, set }) => (
+              <div key={label} className="flex-1">
+                <div style={{ color: "#666", fontSize: "11px", marginBottom: "4px", fontFamily: "monospace" }}>{label}</div>
+                <div className="flex items-center gap-2">
+                  <input type="color" value={val} onChange={(e) => set(e.target.value)} style={{ width: "32px", height: "32px", borderRadius: "6px", border: "1px solid rgba(255,255,255,0.1)", cursor: "pointer", background: "none", padding: "2px" }} />
+                  <input style={{ ...inputStyle, fontFamily: "monospace", fontSize: "12px" }} value={val} onChange={(e) => set(e.target.value)} maxLength={7} />
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  value={primaryColor}
-                  onChange={(e) => {
-                    setPrimaryColor(e.target.value);
-                    setColorPreset(7);
-                  }}
-                  style={{
-                    width: "32px",
-                    height: "32px",
-                    borderRadius: "6px",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    cursor: "pointer",
-                    background: "none",
-                    padding: "2px",
-                  }}
-                />
-                <input
-                  style={{ ...inputStyle, fontFamily: "monospace", fontSize: "12px" }}
-                  value={primaryColor}
-                  onChange={(e) => {
-                    setPrimaryColor(e.target.value);
-                    setColorPreset(7);
-                  }}
-                  maxLength={7}
-                />
-              </div>
-            </div>
-            <div className="flex-1">
-              <div style={{ color: "#666", fontSize: "11px", marginBottom: "4px", fontFamily: "monospace" }}>
-                Secondary
-              </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  value={secondaryColor}
-                  onChange={(e) => {
-                    setSecondaryColor(e.target.value);
-                    setColorPreset(7);
-                  }}
-                  style={{
-                    width: "32px",
-                    height: "32px",
-                    borderRadius: "6px",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    cursor: "pointer",
-                    background: "none",
-                    padding: "2px",
-                  }}
-                />
-                <input
-                  style={{ ...inputStyle, fontFamily: "monospace", fontSize: "12px" }}
-                  value={secondaryColor}
-                  onChange={(e) => {
-                    setSecondaryColor(e.target.value);
-                    setColorPreset(7);
-                  }}
-                  maxLength={7}
-                />
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
         <div>
-          <span style={labelStyle}>Brand Description (optional)</span>
-          <textarea
-            style={{ ...inputStyle, minHeight: "80px", resize: "vertical", lineHeight: "1.5" }}
-            placeholder="Describe your brand's personality, values, or anything specific you want in the logo..."
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            maxLength={300}
-          />
+          <span style={labelStyle}>{t.brandDescription}</span>
+          <textarea style={{ ...inputStyle, minHeight: "80px", resize: "vertical", lineHeight: "1.5" }} placeholder={t.brandDescriptionPlaceholder} value={description} onChange={(e) => setDescription(e.target.value)} maxLength={300} />
         </div>
 
         <button
           type="submit"
-          disabled={isGenerating || (!isLoggedIn ? false : !brandName.trim())}
+          disabled={isGenerating || (isLoggedIn && !brandName.trim())}
           onClick={!isLoggedIn ? (e) => { e.preventDefault(); onLoginClick(); } : undefined}
           style={{
-            width: "100%",
-            padding: "14px",
-            borderRadius: "100px",
-            border: "none",
-            background: isGenerating
-              ? "rgba(255,255,255,0.1)"
-              : "#FFFFFF",
-            color: isGenerating ? "#666" : "#050505",
-            fontWeight: 700,
-            fontSize: "15px",
-            cursor: isGenerating ? "not-allowed" : "pointer",
-            transition: "all 200ms ease",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "8px",
+            width: "100%", padding: "14px", borderRadius: "100px", border: "none",
+            background: isGenerating ? "rgba(255,255,255,0.1)" : "#FFFFFF",
+            color: isGenerating ? "#666" : "#050505", fontWeight: 700, fontSize: "15px",
+            cursor: isGenerating ? "not-allowed" : "pointer", transition: "all 200ms ease",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
           }}
         >
           {isGenerating ? (
             <>
-              <span
-                style={{
-                  width: "16px",
-                  height: "16px",
-                  border: "2px solid rgba(255,255,255,0.3)",
-                  borderTopColor: "#fff",
-                  borderRadius: "50%",
-                  display: "inline-block",
-                  animation: "spin 0.8s linear infinite",
-                }}
-              />
-              Generating logos...
+              <span style={{ width: "16px", height: "16px", border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block", animation: "spin 0.8s linear infinite" }} />
+              {t.generating}
             </>
           ) : !isLoggedIn ? (
             <>
@@ -348,22 +192,17 @@ export default function LogoForm({ onGenerate, isGenerating, isLoggedIn, onLogin
                 <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
                 <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
               </svg>
-              Sign in to Generate
+              {t.signInToGenerate}
             </>
           ) : (
             <>
               <Sparkles className="w-4 h-4" />
-              Generate Logos
+              {t.generateLogos}
             </>
           )}
         </button>
       </div>
-
-      <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </form>
   );
 }
